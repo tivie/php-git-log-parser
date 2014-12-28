@@ -47,7 +47,7 @@ class Parser
         $this->format = $format;
 
         if ($command === null) {
-            $cmd = new Command();
+            $cmd = new Command(\Tivie\Command\DONT_ADD_SPACE_BEFORE_VALUE);
             $cmd->setCommand('git log');
             $cmd->setCommand('git')
                 ->chdir(__DIR__)
