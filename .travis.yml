@@ -5,3 +5,4 @@ php:
   - 5.3
   - hhvm
 install: composer install --no-dev
+sudo: false
