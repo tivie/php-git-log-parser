@@ -54,7 +54,7 @@ class Parser
                 ->addArgument(new Argument('log'))
                 ->addArgument(new Argument('master'))
                 ->addArgument(new Argument('--decorate'))
-                ->addArgument(new Argument('--pretty=format:', $format->getFormat(), null, true));
+                ->addArgument(new Argument('--pretty=format:', $format->getFormatString(), null, true));
             $command = $cmd;
         }
         $this->command = $command;
