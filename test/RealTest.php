@@ -14,7 +14,7 @@ class RealTest extends \PHPUnit_Framework_TestCase
         $dir = realpath(__DIR__ . '/../');
         echo $dir;
         chdir($dir);
-        exec('git log master');
+        passthru('git log');
         $parser->getCommand()->chdir($dir);
         $logArray = $parser->parse();
         self::assertNotEmpty($logArray);

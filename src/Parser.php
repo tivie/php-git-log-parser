@@ -52,7 +52,6 @@ class Parser
             $cmd->setCommand('git')
                 ->chdir(__DIR__)
                 ->addArgument(new Argument('log'))
-                ->addArgument(new Argument('master'))
                 ->addArgument(new Argument('--decorate'))
                 ->addArgument(new Argument('--pretty=format:', $format->getFormatString(), null, true));
             $command = $cmd;
