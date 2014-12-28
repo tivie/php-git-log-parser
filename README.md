@@ -33,4 +33,4 @@ $logArray = $parser->parse();
 ```
 
 ## License
-PHP Git Log Parser is released under Apache 2.0 license. For more information, please consult the [LICENSE](https://github.com/tivie/php-htaccess-parser/blob/master/LICENSE) file in this repository or http://www.apache.org/licenses/LICENSE-2.0.txt.
+PHP Git Log Parser is released under Apache 2.0 license. For more information, please consult the [LICENSE](https://github.com/tivie/php-git-log-parser/blob/master/LICENSE) file in this repository or http://www.apache.org/licenses/LICENSE-2.0.txt.
