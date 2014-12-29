@@ -22,6 +22,8 @@ namespace Tivie\GitLogParser;
 
 use Tivie\Command\Argument;
 use Tivie\Command\Command;
+use Tivie\GitLogParser\Exception\Exception;
+use Tivie\GitLogParser\Exception\InvalidArgumentException;
 
 /**
  * Class Parser
@@ -39,6 +41,10 @@ class Parser
      */
     private $command;
 
+    private $gitDir;
+
+    private $branch;
+
     public function __construct(Format $format = null, Command $command = null)
     {
         if ($format === null) {
@@ -46,17 +52,11 @@ class Parser
         }
         $this->format = $format;
 
-        if ($command === null) {
-            $cmd = new Command(\Tivie\Command\DONT_ADD_SPACE_BEFORE_VALUE);
-            $cmd->setCommand('git log');
-            $cmd->setCommand('git')
-                ->chdir(__DIR__)
-                ->addArgument(new Argument('log'))
-                ->addArgument(new Argument('--decorate'))
-                ->addArgument(new Argument('--pretty=format:', $format->getFormatString(), null, true));
-            $command = $cmd;
-        }
-        $this->command = $command;
+        $this->gitDir = __DIR__;
+
+        $this->branch = 'HEAD';
+
+        $this->command = ($command) ? $command : $this->buildCommand();
     }
 
     /**
@@ -82,7 +82,7 @@ class Parser
     }
 
     /**
-     * Get the Command used
+     * Set the Command to use
      *
      * @param Command $command
      * @return $this
@@ -95,7 +95,7 @@ class Parser
     }
 
     /**
-     * Set the Command to use
+     * Get the Command used
      *
      * @return Command
      */
@@ -104,6 +104,60 @@ class Parser
         return $this->command;
     }
 
+    /**
+     * Set the directory where git log should be run on
+     *
+     * @param string $dir
+     * @return $this
+     * @throws Exception
+     * @throws InvalidArgumentException
+     */
+    public function setGitDir($dir)
+    {
+        if (!is_string($dir)) {
+            throw new InvalidArgumentException('string', 0);
+        }
+
+        if (!realpath($dir)) {
+            throw new Exception("Directory $dir does not exist");
+        }
+        $this->gitDir = $dir;
+
+        return $this;
+    }
+
+    /**
+     * Set the branch that should be logged
+     *
+     * @param string $branch
+     * @return $this
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws \Tivie\Command\Exception\DomainException
+     */
+    public function setBranch($branch)
+    {
+        if (!is_string($branch)) {
+            throw new InvalidArgumentException('string', 0);
+        }
+
+        $oldBranch = $this->branch;
+        $oldArg = $this->command->searchArgument($oldBranch);
+        if (!$oldArg) {
+            throw new Exception("Couldn't change the command to new branch. Was the Command object modified?");
+        }
+        $newArg = new Argument($branch);
+        $this->command->replaceArgument($oldArg, $newArg);
+
+        $this->branch = $branch;
+        return $this;
+    }
+
+    /**
+     * Parse the git log
+     *
+     * @return array
+     */
     public function parse()
     {
         $result = $this->command->run();
@@ -128,5 +182,19 @@ class Parser
 
         }
         return $buffer;
+    }
+
+    private function buildCommand()
+    {
+        $command = new Command(\Tivie\Command\DONT_ADD_SPACE_BEFORE_VALUE);
+        $command
+            ->chdir($this->gitDir)
+            ->setCommand('git')
+            ->addArgument(new Argument('log'))
+            ->addArgument(new Argument($this->branch))
+            ->addArgument(new Argument('--decorate'))
+            ->addArgument(new Argument('--pretty=format:', $this->format->getFormatString(), null, true));
+
+        return $command;
     }
 }
