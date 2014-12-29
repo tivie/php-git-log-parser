@@ -3,6 +3,8 @@
 namespace Tivie\GitLogParser;
 
 
+use Tivie\Command\Argument;
+
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -21,6 +23,46 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $json = json_decode($gitlogJson, true);
         self::assertEquals($json, $res);
 
+    }
+
+    /**
+     * @covers \Tivie\GitLogParser\Parser::setGitDir
+     */
+    public function testSetGitDir()
+    {
+        $dir = '/foo/bar/baz';
+
+        $cmd = $this->getMockBuilder('\Tivie\Command\Command')
+            ->setMethods(array('chdir'))
+            ->getMock();
+
+        $cmd->expects($this->once())
+            ->method('chdir')
+            ->with($dir);
+
+        $parser = new Parser(null, $cmd);
+        $parser->setGitDir($dir, false);
+    }
+
+    public function testSetBranch()
+    {
+        $oldArg = new Argument('foo');
+
+        $cmd = $this->getMockBuilder('\Tivie\Command\Command')
+            ->setMethods(array('searchArgument', 'replaceArgument'))
+            ->getMock();
+
+        $cmd->expects($this->once())
+            ->method('searchArgument')
+            ->with('HEAD')
+            ->willReturn($oldArg);
+
+        $cmd->expects($this->once())
+            ->method('replaceArgument')
+            ->with($oldArg, $this->anything());
+
+        $parser = new Parser(null, $cmd);
+        $parser->setBranch('master');
     }
 
     private function createCommandMock($result)

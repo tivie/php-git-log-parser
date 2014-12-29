@@ -12,7 +12,7 @@ class RealTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new \Tivie\GitLogParser\Parser();
         $dir = realpath(__DIR__ . '/../');
-        $parser->getCommand()->chdir($dir);
+        $parser->setGitDir($dir);
         $logArray = $parser->parse();
         self::assertNotEmpty($logArray);
     }

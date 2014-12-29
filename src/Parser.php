@@ -108,21 +108,22 @@ class Parser
      * Set the directory where git log should be run on
      *
      * @param string $dir
+     * @param boolean $check Check if the directory exists
      * @return $this
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function setGitDir($dir)
+    public function setGitDir($dir, $check = true)
     {
         if (!is_string($dir)) {
             throw new InvalidArgumentException('string', 0);
         }
 
-        if (!realpath($dir)) {
+        if ($check && !realpath($dir)) {
             throw new Exception("Directory $dir does not exist");
         }
         $this->gitDir = $dir;
-
+        $this->command->chdir($dir);
         return $this;
     }
 
@@ -188,7 +189,7 @@ class Parser
     {
         $command = new Command(\Tivie\Command\DONT_ADD_SPACE_BEFORE_VALUE);
         $command
-            ->chdir($this->gitDir)
+            ->chdir(realpath($this->gitDir))
             ->setCommand('git')
             ->addArgument(new Argument('log'))
             ->addArgument(new Argument($this->branch))
