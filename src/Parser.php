@@ -172,7 +172,7 @@ class Parser
             $entry = array();
 
             foreach ($fields as $field) {
-                if (!preg_match('^\[(\S*?)\](.*)/', $field, $matches)) {
+                if (!preg_match('/^\[(\S*?)\](.*)/', $field, $matches)) {
                     continue;
                 }
                 $entry[trim($matches[1])] = trim($matches[2]);
