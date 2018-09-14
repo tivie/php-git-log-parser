@@ -2,15 +2,15 @@
 /**
  * -- tivie/php-git-log-parser --
  * Parser.php created at 22-12-2014
- * 
+ *
  * Copyright 2014 Estevão Soares dos Santos
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,11 +45,16 @@ class Parser
 
     private $branch;
 
-    public function __construct(Format $format = null, Command $command = null)
+    private $revision;
+
+    public function __construct(Format $format = null, Command $command = null, $revision = null)
     {
         if ($format === null) {
             $format = new Format();
         }
+
+        $this->revision = $revision;
+
         $this->format = $format;
 
         $this->gitDir = __DIR__;
@@ -102,6 +107,23 @@ class Parser
     public function getCommand()
     {
         return $this->command;
+    }
+
+
+    /**
+     * @param mixed $revision
+     */
+    public function setRevision($revision)
+    {
+        $this->revision = $revision;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRevision()
+    {
+        return $this->revision;
     }
 
     /**
@@ -195,6 +217,10 @@ class Parser
             ->addArgument(new Argument($this->branch))
             ->addArgument(new Argument('--decorate'))
             ->addArgument(new Argument('--pretty=format:', $this->format->getFormatString(), null, true));
+
+        if($this->getRevision() !== null){
+            $command->addArgument(new Argument($this->getRevision()));
+        }
 
         return $command;
     }
