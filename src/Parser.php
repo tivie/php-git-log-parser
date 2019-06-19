@@ -60,8 +60,6 @@ class Parser
         $this->gitDir = __DIR__;
 
         $this->branch = 'HEAD';
-
-        $this->command = ($command) ? $command : $this->buildCommand();
     }
 
     /**
@@ -106,6 +104,8 @@ class Parser
      */
     public function getCommand()
     {
+        if (!$this->command) $this->command = $this->buildCommand();
+
         return $this->command;
     }
 
@@ -145,7 +145,7 @@ class Parser
             throw new Exception("Directory $dir does not exist");
         }
         $this->gitDir = $dir;
-        $this->command->chdir($dir);
+        if ($this->command) $this->command->chdir($dir);
         return $this;
     }
 
@@ -164,13 +164,16 @@ class Parser
             throw new InvalidArgumentException('string', 0);
         }
 
-        $oldBranch = $this->branch;
-        $oldArg = $this->command->searchArgument($oldBranch);
-        if (!$oldArg) {
-            throw new Exception("Couldn't change the command to new branch. Was the Command object modified?");
+        if ($this->command) {
+            $oldBranch = $this->branch;
+            $oldArg = $this->command->searchArgument($oldBranch);
+            if (!$oldArg) {
+                throw new Exception("Couldn't change the command to new branch. Was the Command object modified?");
+            }
+
+            $newArg = new Argument($branch);
+            $this->command->replaceArgument($oldArg, $newArg);
         }
-        $newArg = new Argument($branch);
-        $this->command->replaceArgument($oldArg, $newArg);
 
         $this->branch = $branch;
         return $this;
@@ -183,7 +186,8 @@ class Parser
      */
     public function parse()
     {
-        $result = $this->command->run();
+        $command = $this->getCommand();
+        $result = $command->run();
         $log = $result->getStdOut();
 
         $buffer = array();
