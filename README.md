@@ -28,11 +28,18 @@ or run the following command:
     php composer.phar require tivie/php-git-log-parser
 
 ## Quick guide
-To parse the current git repository log, you can simply
+To parse a git repository log, you can simply
 
 ```php
+$repositoryPath = '/path_to_your_repo';
+$revision = 'fe4f1105e10a8fedeb0b4f2f8c4ea43bec56a256..'
+
 $parser = new \Tivie\GitLogParser\Parser();
+$parser->setGitDir($repositoryPath);
+$parser->setRevision($revision);
+echo $parser->getCommand();
 $logArray = $parser->parse();
+
 ```
 
 ## License
