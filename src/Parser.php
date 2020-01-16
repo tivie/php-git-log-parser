@@ -1,4 +1,5 @@
 <?php
+
 /**
  * -- tivie/php-git-log-parser --
  * Parser.php created at 22-12-2014
@@ -47,6 +48,8 @@ class Parser
 
     private $revision;
 
+    private $limit;
+
     public function __construct(Format $format = null, Command $command = null, $revision = null)
     {
         if ($format === null) {
@@ -84,6 +87,41 @@ class Parser
     public function getFormat()
     {
         return $this->format;
+    }
+
+    /**
+     * Set Limit of commits
+     *
+     * @param integer $limit
+     * @return $this
+     */
+    public function setLimit(int $limit = 50)
+    {
+        $parameter = '-n ';
+        $old_limit = $parameter . $this->limit;
+        $new_limit = $parameter . $limit;
+        $old_arg = $this->command->searchArgument($old_limit);
+        $new_arg = new Argument($new_limit);
+
+        if ($old_arg) {
+            $this->command->replaceArgument($old_arg, $new_arg);
+        } else {
+            $this->command->addArgument($new_arg);
+        }
+
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    /**
+     * Get the Limit used
+     *
+     * @return Command
+     */
+    public function getLimit()
+    {
+        return $this->limit;
     }
 
     /**
@@ -202,7 +240,6 @@ class Parser
             if (!empty($entry)) {
                 $buffer[] = $entry;
             }
-
         }
         return $buffer;
     }
@@ -218,7 +255,7 @@ class Parser
             ->addArgument(new Argument('--decorate'))
             ->addArgument(new Argument('--pretty=format:', $this->format->getFormatString(), null, true));
 
-        if($this->getRevision() !== null){
+        if ($this->getRevision() !== null) {
             $command->addArgument(new Argument($this->getRevision()));
         }
 
